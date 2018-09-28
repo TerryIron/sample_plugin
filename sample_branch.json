@@ -1,0 +1,9 @@
+{
+    "remote": "gitlab",
+    "test_module": "0.1.0",
+    "platform": {
+        "name": "test_project",
+        "repo": "http://test:123456@www.test.com:80/test/test_project.git",
+        "plugin_dir": "test/plugins"
+    }
+}

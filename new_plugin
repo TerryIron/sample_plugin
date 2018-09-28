@@ -1,0 +1,65 @@
+#!/bin/bash
+#
+# Copyright (c) 2015-2018  Terry Xi
+# All Rights Reserved.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+
+[ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "-help" ] && {
+echo "usage: new_plugin [-h] [-n --no-version-name] PLUGIN_NAME PLUGIN_TYPE [PLUGIN_MODE=normal,server] [PLUGIN_VER] ..."
+    exit
+}
+
+pwd=$(pwd)
+tag=$1
+if [[ "$tag" == "-n" || "$tag" == "--no-version-name" ]]; then
+tag="1"
+name=$2
+typ=$3
+mode=$4
+ver=$5
+else
+tag="0"
+name=$1
+typ=$2
+mode=$3
+ver=$4
+fi
+[ -z "$typ" ] && {
+    echo "Please config plugin type"
+    exit
+}
+[ -z "$mode" ] && {
+    mode="normal"
+}
+[ -z "$ver" ] && {
+    ver="0.1.0"
+}
+path="$pwd/templates"
+
+bin="$pwd/bin"
+
+
+cd $bin
+if [[ "$tag" == "1" ]]; then
+new_branch="plugin_$typ""_$name"
+else
+new_branch="plugin_$typ""_$name""_$ver"
+fi
+git checkout master
+git branch $new_branch
+git checkout $new_branch
+./new_plugin "$name" "$typ" "$ver" "$path" "$mode"
+cd $pwd

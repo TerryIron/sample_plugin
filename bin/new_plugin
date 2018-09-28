@@ -1,0 +1,92 @@
+#!/bin/bash
+#
+# Copyright (c) 2015-2018  Terry Xi
+# All Rights Reserved.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+
+
+function new_plugin() {
+    local plugin_name="$1"
+    local plugin_path="$2"
+    local plugin_type="$3"
+    local plugin_ver="$4"
+    local plugin_mode="$5"
+    local old_pwd=$(pwd)
+    local split="_"
+
+    cd $plugin_path
+    mkdir -p $plugin_type$split$plugin_name
+    local _plugin=$plugin_type$split$plugin_name
+
+    source "$old_pwd/template/app_loader"
+
+    app_loader "$_plugin" "$plugin_name" "$plugin_path" "$plugin_type" "$plugin_ver" "$plugin_mode"
+
+    cd $old_pwd
+    echo "plugin $plugin_name is created"
+}
+
+function help() {
+    echo "usage: new_plugin [-h] PLUGIN_NAME PLUGIN_TYPE PLUGIN_VER PLUGIN_PATH ..."
+}
+
+function main() {
+    local plugin_name="$1"
+    local plugin_path="$2"
+    local plugin_type="$3"
+    local plugin_ver="$4"
+    local plugin_mode="$5"
+    local old_pwd=$(pwd)
+
+    cd $plugin_path
+    [ -d "$plugin_name" ] && {
+        echo "plugin $plugin_name is exist"
+        cd $old_pwd
+        exit 1
+    }
+    cd $old_pwd
+    new_plugin "$plugin_name" "$plugin_path" "$plugin_type" "$plugin_ver" "$plugin_mode"
+}
+
+target_type=$2
+target_ver=$3
+target_path=$4
+# support [normal, server]
+target_mode=$5
+[ -z "$target_type" ] && {
+    help 
+    exit
+}
+[ -z "$target_ver" ] && {
+    target_ver="normal"
+}
+[ -z "$target_ver" ] && {
+    target_ver="0.1.0"
+}
+[ -z "$target_path" ] && {
+    target_path=$(pwd)
+}
+[ "$1" == "-h" ] && {
+    help 
+    exit
+} || {
+    [ "$1" == "" ] && {
+        help 
+        exit
+    }
+}
+
+main "$1" "$target_path" "$target_type" "$target_ver" "$target_mode"

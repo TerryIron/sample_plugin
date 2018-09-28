@@ -1,0 +1,69 @@
+#!/bin/bash
+#
+# Copyright (c) 2015-2018  Terry Xi
+# All Rights Reserved.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+
+
+function build_plugin() {
+    local plugin_name="$1"
+    local plugin_path="$2"
+    local old_pwd=$(pwd)
+
+    cd $plugin_path
+    [ -f "$plugin_name/app.json" ] && {
+        zip -r $plugin_name".zip" $plugin_name
+        echo "plugin $plugin_name is built"
+    } || {
+        echo "plugin $plugin_name lost config file"
+}
+    cd $old_pwd
+}
+
+function help() {
+    echo "usage: build_plugin [-h] PLUGIN_NAME PLUGIN_PATH ..."
+}
+
+function main() {
+    local plugin_name="$1"
+    local plugin_path="$2"
+    local old_pwd=$(pwd)
+
+    cd $plugin_path
+    [ -d "$plugin_name" ] || {
+        echo "plugin $plugin_name is not exist"
+        cd $old_pwd
+        exit 1
+    }
+    cd $old_pwd
+    build_plugin "$plugin_name" "$plugin_path"
+}
+
+target_path=$2
+[ "$target_path" != "" ] || {
+    target_path=$(pwd)
+}
+[ "$1" == "-h" ] && {
+    help 
+    exit
+} || {
+    [ "$1" == "" ] && {
+        help 
+        exit
+    }
+}
+
+main "$1" "$target_path"

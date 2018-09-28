@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# Copyright (c) 2015-2018  Terry Xi
+# All Rights Reserved.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+
+PWD=$(pwd)
+
+
+function pack_plugins() {
+    local target_path=$1
+    for d in $(find -type d  -maxdepth 1 2>/dev/null);do
+        if [ "$(ls $d | grep app.json$)" != "" ]; then
+            local removepath=""
+            for p in $(find  $d | grep activate$);do
+                removepath=$removepath" $(echo $p|awk -F'/' '{print $3}')"
+            done
+            local zip_args=""
+            local path=$(echo $d|awk -F'/' '{print $2}')
+            zip_args=$zip_args" -9 -r $target_path/$path.zip" 
+            for i in $removepath; do
+                zip_args=$zip_args" --exclude=$path/$i*"
+            done
+            zip_args=$zip_args" $d"
+            zip $zip_args
+        fi
+    done
+}
+
+function main() {
+    local target_path="target"
+    mkdir -p $target_path
+    target_path="$PWD/$target_path"
+    cd templates
+    pack_plugins "$target_path"
+    cd $PWD 
+}
+
+main
+

@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>插件平台 &mdash; test 0.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="test 0.1 documentation" href="../index.html"/>
+        <link rel="prev" title="插件使用说明" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> test
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">插件平台</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">插件制作</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id3">软件需求</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">如何提交插件</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">插件发布</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id6">插件平台发布</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id7">插件平台配置模板</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#branch">支持branch下载</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tag">支持tag下载</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">test</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+    <li>插件平台</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/src/intr.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="id1">
+<h1>插件平台<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id2">
+<h2>插件制作<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id3">
+<h3>软件需求<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Python 2.7+</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h3>如何提交插件<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>进入安装目录</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>cd &lt;directory containing this file&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li>新建插件</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>./new_plugin PLUGIN_NAME
+</pre></div>
+</div>
+<ul class="simple">
+<li>开发插件</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>./workon_plugin PLUGIN_NAME
+</pre></div>
+</div>
+<ul class="simple">
+<li>提交插件</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>./push_plugin PLUGIN_NAME
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>插件发布<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>进入安装目录</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>cd &lt;directory containing this file&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li>打包插件</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>./build_plugin PLUGIN_NAME [VER]
+</pre></div>
+</div>
+<ul class="simple">
+<li>安装插件</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>./install_plugin PLUGIN_NAME INSTALL_PATH
+</pre></div>
+</div>
+</div>
+<div class="section" id="id6">
+<h2>插件平台发布<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>发布平台</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>./publish_platform plugin_pack.json
+</pre></div>
+</div>
+<div class="section" id="id7">
+<h3>插件平台配置模板<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>plugin_pack.json</li>
+</ul>
+<div class="section" id="branch">
+<h4>支持branch下载<a class="headerlink" href="#branch" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;remote&quot;</span><span class="p">:</span> <span class="s2">&quot;origin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;plugin_A&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;plugin_B&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1.2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;plugin_C&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1.3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;platform&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tag&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;repo&quot;</span><span class="p">:</span> <span class="s2">&quot;git_url&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;plugin_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;plugin&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tag">
+<h4>支持tag下载<a class="headerlink" href="#tag" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;plugin_A&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;plugin_B&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1.2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;plugin_C&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1.3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;platform&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tag&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;repo&quot;</span><span class="p">:</span> <span class="s2">&quot;git_url&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;plugin_dir&quot;</span><span class="p">:</span> <span class="s2">&quot;plugin&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="15%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">字段名</th>
+<th class="head">必要</th>
+<th class="head">说明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>remote</td>
+<td>N</td>
+<td>插件远端仓库, 默认使用origin</td>
+</tr>
+<tr class="row-odd"><td>platform</td>
+<td>Y</td>
+<td>配置平台属性</td>
+</tr>
+<tr class="row-even"><td>name</td>
+<td>Y</td>
+<td>发布名称</td>
+</tr>
+<tr class="row-odd"><td>tag</td>
+<td>N</td>
+<td>发布分支, 默认使用master分支</td>
+</tr>
+<tr class="row-even"><td>repo</td>
+<td>Y</td>
+<td>仓库地址</td>
+</tr>
+<tr class="row-odd"><td>plugin_dir</td>
+<td>Y</td>
+<td>插件目录</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../index.html" class="btn btn-neutral" title="插件使用说明" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright test.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
