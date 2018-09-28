@@ -18,13 +18,16 @@
 
 
 function app_loader() {
-    local plugin_full_name="$1"
-    local plugin_name="$2"
-    local plugin_path="$3"
-    local plugin_type="$4"
-    local plugin_ver="$5"
-    local plugin_mode="$6"
+    local module_path="$1"
+    local plugin_full_name="$2"
+    local plugin_name="$3"
+    local plugin_path="$4"
+    local plugin_type="$5"
+    local plugin_ver="$6"
+    local plugin_mode="$7"
     local old_pwd=$(pwd)
+
+    rm -f $module_path/loader.py
 
 cat >> $plugin_full_name/__init__.py << EOF
 #!/usr/bin/env python
