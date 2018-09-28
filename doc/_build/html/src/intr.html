@@ -82,14 +82,27 @@
             
                 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="">插件平台</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#id2">插件制作</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id3">软件需求</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id4">如何提交插件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">插件模板</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">插件基础</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id4">插件组成</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">插件模板介绍</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id6">插件配置介绍</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id7">插件管道</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id8">插件管道启动</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id9">插件管道流向</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#id5">插件发布</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id6">插件平台发布</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id7">插件平台配置模板</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id10">插件配置模板</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id11">插件制作</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id12">软件需求</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id13">如何提交插件</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id14">插件发布</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id15">插件平台发布</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id16">插件平台配置模板</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#branch">支持branch下载</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tag">支持tag下载</a></li>
 </ul>
@@ -145,15 +158,203 @@
   <div class="section" id="id1">
 <h1>插件平台<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id2">
-<h2>插件制作<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<h2>插件模板<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>normal(基础)</li>
+<li>server(服务端)</li>
+</ul>
+</div>
 <div class="section" id="id3">
-<h3>软件需求<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<h2>插件基础<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id4">
+<h3>插件组成<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>app.json(插件配置文件)</li>
+<li>app.py(插件基础模板)</li>
+<li>server.py(插件服务端模板)</li>
+<li>requirement.txt(插件依赖)</li>
+<li><strong>init</strong>.py(插件包初始化）</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h3>插件模板介绍<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>app.json</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;language&quot;</span><span class="p">:</span> <span class="s2">&quot;python2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;imports&quot;</span><span class="p">:</span> <span class="s2">&quot;requirements.txt&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;actions&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;init&quot;</span><span class="p">:</span> <span class="s2">&quot;app.init&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="s2">&quot;app.start&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;stop&quot;</span><span class="p">:</span> <span class="s2">&quot;app.stop&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;public_actions&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s2">&quot;start&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;stop&quot;</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;init&quot;</span><span class="p">:</span> <span class="s2">&quot;init&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;call&quot;</span><span class="p">:</span> <span class="s2">&quot;start&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="12%" />
+<col width="61%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">字段名</th>
+<th class="head">必要</th>
+<th class="head">说明</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>version</td>
+<td>Y</td>
+<td>插件版本号，支持插件升级</td>
+</tr>
+<tr class="row-odd"><td>type</td>
+<td>Y</td>
+<td>插件类型</td>
+</tr>
+<tr class="row-even"><td>name</td>
+<td>Y</td>
+<td>插件名称</td>
+</tr>
+<tr class="row-odd"><td>language</td>
+<td>Y</td>
+<td>插件使用语言， 未来支持不同语言</td>
+</tr>
+<tr class="row-even"><td>imports</td>
+<td>Y</td>
+<td>插件依赖文件</td>
+</tr>
+<tr class="row-odd"><td>actions</td>
+<td>Y</td>
+<td>插件操作定义</td>
+</tr>
+<tr class="row-even"><td>public_actions</td>
+<td>N</td>
+<td>插件支持调用定义, 用于支持插件之间调用</td>
+</tr>
+<tr class="row-odd"><td>init</td>
+<td>Y</td>
+<td>插件初始化操作，请先在actions中定义</td>
+</tr>
+<tr class="row-even"><td>call</td>
+<td>Y</td>
+<td>插件默认操作，请现在actions中定义</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="id6">
+<h3>插件配置介绍<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>app.py</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span>import logging
+
+
+class Application(object):
+
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
+    def set_logger(self, logger):
+        self.logger = logger
+
+
+APP = None
+CONFIG = {}
+
+
+def init():
+    global APP
+    APP = Application()
+    CONFIG[&#39;logger.path&#39;] = &#39;/tmp/$plugin_name.log&#39;
+
+
+def start(loader, **kwargs):
+    return {&#39;result&#39;: {}, &#39;data&#39;: {}}
+
+
+def stop(loader, **kwargs):
+    return {&#39;result&#39;: {}, &#39;data&#39;: {}}
+
+定义的函数中loader表示加载器类， kwargs表示数据通道
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Loader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    插件加载类</span>
+<span class="sd">    :prop config: 插件所在数据通道配置表</span>
+<span class="sd">    :prop current_channel: 插件所在数据通道名称</span>
+<span class="sd">    :prop config_channel: 插件配置通道名称</span>
+<span class="sd">    :prop channel_scope: 插件数据通道范围</span>
+<span class="sd">    :prop logger: 插件日志</span>
+<span class="sd">    :prop logger_name: 插件日志打印名称</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id7">
+<h3>插件管道<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id8">
+<h4>插件管道启动<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h4>
+</div>
+<div class="section" id="id9">
+<h4>插件管道流向<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+</div>
+</div>
+<div class="section" id="id10">
+<h3>插件配置模板<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span></span>[plugin:main]
+# 主入口
+start = app
+
+[pipeline:app]
+# 管道组件
+align = a.start c:result b:boom c:result p:app_test
+
+[boardcast:boom]
+# 广播组件
+align = a b
+
+[pipeline:app_test]
+# 管道组件
+align = c
+
+[app:a]
+# 插件实例
+load = sample_a.zip
+
+[app:b]
+# 插件实例
+load = sample_b.zip
+
+[app:c]
+# 插件实例
+load = sample_c.zip
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id11">
+<h2>插件制作<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id12">
+<h3>软件需求<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>Python 2.7+</li>
 </ul>
 </div>
-<div class="section" id="id4">
-<h3>如何提交插件<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id13">
+<h3>如何提交插件<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>进入安装目录</li>
 </ul>
@@ -180,8 +381,8 @@
 </div>
 </div>
 </div>
-<div class="section" id="id5">
-<h2>插件发布<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id14">
+<h2>插件发布<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>进入安装目录</li>
 </ul>
@@ -201,16 +402,16 @@
 </pre></div>
 </div>
 </div>
-<div class="section" id="id6">
-<h2>插件平台发布<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id15">
+<h2>插件平台发布<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>发布平台</li>
 </ul>
 <div class="highlight-python"><div class="highlight"><pre><span></span>./publish_platform plugin_pack.json
 </pre></div>
 </div>
-<div class="section" id="id7">
-<h3>插件平台配置模板<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id16">
+<h3>插件平台配置模板<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li>plugin_pack.json</li>
 </ul>

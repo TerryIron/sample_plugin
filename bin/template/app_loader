@@ -25,6 +25,447 @@ function app_loader() {
     local plugin_ver="$5"
     local plugin_mode="$6"
     local old_pwd=$(pwd)
+
+cat >> $plugin_full_name/__init__.py << EOF
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2015-2018  Terry Xi
+# All Rights Reserved.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+EOF
+cat >> $plugin_full_name/requirements.txt << EOF
+EOF
+cat >> $plugin_full_name/README.md<< EOF
+# $plugin_name README
+
+## Actions(支持操作)
+
+* start(开始)
+\`\`\`
+    配置参数:
+    arg:logger.path=配置日志文件
+\`\`\`
+
+* stop(结束)
+\`\`\`
+    配置参数:
+    arg:logger.path=配置日志文件
+\`\`\`
+EOF
+[ "$plugin_mode"  == "normal" ] && {
+cat >> $plugin_full_name/app.py << EOF
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2015-2018  Terry Xi
+# All Rights Reserved.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+import logging
+
+
+class Application(object):
+
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
+    def set_logger(self, logger):
+        self.logger = logger
+
+
+APP = None
+CONFIG = {}
+
+
+def init():
+    global APP
+    APP = Application()
+    CONFIG['logger.path'] = '/tmp/$plugin_name.log'
+
+
+def config(**global_config):
+    _config = dict()
+    return _config
+
+
+def start(loader, **kwargs):
+    _result = dict()
+    for d in loader.channel_scope:
+        _result[d] = kwargs[d]
+    conf = config(**loader.config)
+    loader.logger.add_handler(conf['logger.path'])
+    APP.set_logger(loader.logger)
+    set_logger(loader.logger, name=loader.logger_name)
+
+    _data = kwargs[loader.current_channel]
+
+    return _result
+
+
+def stop(loader, **kwargs):
+    _result = dict()
+    for d in loader.channel_scope:
+        _result[d] = kwargs[d]
+    conf = config(**loader.config)
+    loader.logger.add_handler(conf['logger.path'])
+    APP.set_logger(loader.logger)
+    set_logger(loader.logger, name=loader.logger_name)
+
+    _data = kwargs[loader.current_channel]
+
+    return _result
+
+EOF
+}
+[ "$plugin_mode"  == "server" ] && {
+cat >> $plugin_full_name/server.py << EOF
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2015-2018  Terry Xi
+# All Rights Reserved.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+import time
+import datetime
+import tornado.gen
+import tornado.ioloop
+import tornado.wsgi
+import tornado.web
+from tornado.ioloop import IOLoop
+from functools import wraps
+
+
+_ROUTE = {}
+
+
+@tornado.gen.coroutine
+def async_sleep(seconds):
+    yield tornado.gen.Task(IOLoop.instance().add_timeout, time.time() + seconds)
+
+
+def call_later(delay=0):
+    def wrap_loop(func):
+        @wraps(func)
+        def wrap_func(*args, **kwargs):
+            return IOLoop.instance().call_later(delay, func, *args, **kwargs)
+
+        return wrap_func
+
+    return wrap_loop
+
+
+def call_event(delta=60):
+    _delta = delta * 1000
+    _args = {'args': []}
+
+    def wrap_loop(func):
+        @wraps(func)
+        @tornado.gen.coroutine
+        def wrap_func(*args, **kwargs):
+            ret = None
+            if not _args['args']:
+                _args['args'] = args
+            try:
+                ret = func(*_args['args'], **kwargs)
+            except Exception as e:
+                pass
+
+            IOLoop.instance().add_timeout(
+                datetime.timedelta(milliseconds=_delta), wrap_func)
+            return ret
+
+        return wrap_func
+
+    return wrap_loop
+
+
+def initialize(self, **kwargs):
+    for k, v in kwargs.items():
+        setattr(self, k, v()) if callable(v) else setattr(self, k, v)
+
+
+tornado.web.RequestHandler.initialize = initialize
+
+
+class Application(tornado.web.Application):
+
+    def __init__(self, *handlers, **settings):
+        _session_settings = {
+            'driver': 'memory',
+            'driver_settings': dict(host=self),
+            'force_persistence': True,
+            'sid_name': 'torndsessionID',
+            'session_lifetime': 1800
+        }
+        settings.update(**dict(session=_session_settings))
+        super(Application, self).__init__(*handlers, **settings)
+
+
+_APP = Application
+
+
+def make_app(route=None):
+    _target_route = route if route else _ROUTE
+    return _APP(_target_route)
+
+
+def make_route(**routes):
+    global _ROUTE
+    _target_routes = routes
+    _target_routes = [(r'{0}'.format(i), j)
+                      for i, j in _target_routes.items()]
+    _ROUTE = _target_routes
+    return _ROUTE
+
+
+def classprobe(entry_method, **kwargs):
+    def _singleton(cls, *args, **kw):
+        instances = {}
+        if hasattr(cls, entry_method) and callable(getattr(cls, entry_method)):
+            getattr(cls, entry_method)(**kwargs)
+
+        def __singleton():
+            if cls not in instances:
+                instances[cls] = cls(*args, **kw)
+            return instances[cls]
+
+        return __singleton
+
+    return _singleton
+
+
+if __name__ == "__main__":
+    from concurrent.futures import ThreadPoolExecutor
+    import json
+
+    @classprobe('run_plugins')
+    class MainHandler(tornado.web.RequestHandler):
+        executor = ThreadPoolExecutor(100)
+
+        @classmethod
+        @call_later(3)
+        def run_plugins(cls):
+            pass
+
+    class TestHandler(tornado.web.RequestHandler):
+
+        def get(self):
+            print json.loads(self.request.body)
+            self.write('get')
+
+        def post(self):
+            print json.loads(self.request.body)
+            self.write('post')
+
+    r = dict()
+    r[r'/'] = MainHandler
+    r[r'/test'] = TestHandler
+    route = make_route(**r)
+    app = make_app(route)
+    app.listen(8889, '127.0.0.1')
+    tornado.ioloop.IOLoop.current().start()
+
+EOF
+cat >> $plugin_full_name/app.py << EOF
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2015-2018  Terry Xi
+# All Rights Reserved.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+# TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+import time
+import json
+import urllib
+import logging
+import requests
+import datetime
+from multiprocessing import Queue, Process
+from concurrent.futures import ThreadPoolExecutor
+from tornado.concurrent import run_on_executor
+import tornado.web
+import tornado.ioloop
+
+from .server import classprobe, call_later, call_event
+
+
+QUEUE = Queue()
+
+
+def _put_message(data):
+    if data:
+        QUEUE.put(data)
+
+
+class Application(object):
+
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
+    def set_logger(self, logger):
+        self.logger = logger
+
+
+_APP = Application()
+
+
+@classprobe('run')
+class Schedule(tornado.web.RequestHandler):
+    executor = ThreadPoolExecutor(100)
+    HOST = '127.0.0.1'
+    PORT = 8889
+
+    @classmethod
+    @call_later(3)
+    @run_on_executor
+    def run(cls):
+        pass
+
+    @classmethod
+    @call_event(30 * 60)
+    @run_on_executor
+    def do_task(cls):
+        pass
+
+
+APP_ROUTE = {}
+APP = None
+CONFIG = {}
+PID = None
+
+
+def init():
+    CONFIG['logger.path'] = '/tmp/$plugin_name.log'
+    CONFIG['$plugin_name.port'] = 8889
+    CONFIG['$plugin_name.host'] = '127.0.0.1'
+
+
+def config(**global_config):
+    c = dict()
+    c['logger.path'] = global_config.get('logger.path', CONFIG['logger.path'])
+    c['$plugin_name.host'] = global_config.get(
+        '$plugin_name.host',
+        CONFIG['$plugin_name.host'])
+    c['$plugin_name.port'] = global_config.get(
+        '$plugin_name.port',
+        CONFIG['$plugin_name.port'])
+    return c
+
+
+def start(loader, **kwargs):
+    from .server import make_route, make_app
+    _result = dict()
+    c = config(**loader.config)
+    loader.logger.add_handler(c['logger.path'])
+    _APP.set_logger(loader.logger)
+
+    def start_app():
+        global APP
+        Schedule.HOST = c['$plugin_name.host']
+        Schedule.PORT = c['$plugin_name.port']
+        route = make_route(**APP_ROUTE)
+        APP = make_app(route)
+        APP.listen(int(c['$plugin_name.port']), str(c['$plugin_name.host']))
+        tornado.ioloop.IOLoop.current().start()
+
+    if not PID:
+        p = Process(target=start_app)
+        p.daemon = True
+        p.start()
+        PID = int(str(p.pid))
+
+    import signal
+
+    def kill_process(*args, **kwargs):
+        import os
+        try:
+            os.kill(PID, signal.SIGKILL)
+        except:
+            pass
+
+    signal.signal(signal.SIGINT, kill_process)
+
+    while True:
+        d = QUEUE.get()
+        if d:
+            _result['result'] = d
+            _result['data'] = d
+            _result[loader.config_channel] = kwargs[loader.config_channel]
+            yield _result
+
+EOF
+}
+
+cat >> $plugin_full_name/app.json << EOF
+{
+    "version": "$plugin_ver",
+    "type": "$plugin_type",
+    "name": "$plugin_type$split$plugin_name",
+    "language": "python2",
+    "imports": "requirements.txt",
+    "actions": {
+        "init": "app.init",
+        "start": "app.start",
+        "stop": "app.stop"
+    },
+    "public_actions": [
+        "start",
+        "stop"
+    ],
+    "init": "init",
+    "call": "start"
+}
+EOF
  
 }
 
