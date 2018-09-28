@@ -31,9 +31,7 @@ function new_plugin() {
     mkdir -p $plugin_type$split$plugin_name
     local _plugin=$plugin_type$split$plugin_name
 
-    source "$old_pwd/template/app_loader"
-
-    app_loader "$_plugin" "$plugin_name" "$plugin_path" "$plugin_type" "$plugin_ver" "$plugin_mode"
+    # new_plugin code
 
     cd $old_pwd
     echo "plugin $plugin_name is created"
