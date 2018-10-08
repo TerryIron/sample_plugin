@@ -51,20 +51,24 @@ def process_plugin(key, value, remote=None, plugin_path=None):
         _output = commands.getoutput('git tag | grep plugin_ | grep {} | grep {}'.format(key, value))
     if _output:
         _output = _output.split('/')[-1]
-        if not os.path.exists('./target/{}'.format(plugin_path)):
-            raise Exception('Platform plugin_dir not found, {}'.format(plugin_path))
         print 'Pack Plugin {} Ver:{}'.format(key, value)
-        print commands.getoutput('git checkout {} && ./pack_plugin && cp ./target/{}.zip ./target/{}'.format(_output, key, plugin_path))
+        if plugin_path is not None:
+            if not os.path.exists('./target/{}'.format(plugin_path)):
+                raise Exception('Platform plugin_dir not found, {}'.format(plugin_path))
+            print commands.getoutput('git checkout {} && ./pack_plugin && cp ./target/{}.zip ./target/{}'.format(_output, key, plugin_path))
+        else:
+            print commands.getoutput('git checkout {} && ./pack_plugin'.format(_output))
 
 
 def main():
     _config_path = sys.argv[1]
     f = open(_config_path)
     _dict = json.loads(f.read())
-    if 'platform' not in _dict:
-        raise Exception('Platform not found')
-    _platform_dict = _dict.pop('platform')
-    _plugin_path = process_platform(**_platform_dict)
+    _platform_dict = None
+    _plugin_path = None
+    if 'platform' in _dict:
+        _platform_dict = _dict.pop('platform')
+        _plugin_path = process_platform(**_platform_dict)
 
     if 'remote' not in _dict:
         _remote = None
@@ -76,7 +80,9 @@ def main():
     for k, v in _dict.items():
         process_plugin(k, v, remote=_remote, plugin_path=_plugin_path)
 
-    pack_platform(**_platform_dict)
+    if _platform_dict:
+        pack_platform(**_platform_dict)
+    commands.getoutput('git checkout master')
 
 
 if __name__ == '__main__':
