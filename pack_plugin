@@ -23,7 +23,7 @@ PWD=$(pwd)
 function pack_plugins() {
     local target_path=$1
     for d in $(find -type d  -maxdepth 1 2>/dev/null);do
-        if [ "$(ls $d | grep app.json$)" != "" ]; then
+        if [ "$(ls $d | grep README.md$)" != "" ]; then
             local removepath=""
             for p in $(find  $d | grep activate$);do
                 removepath=$removepath" $(echo $p|awk -F'/' '{print $3}')"
@@ -36,6 +36,7 @@ function pack_plugins() {
             done
             zip_args=$zip_args" $d"
             zip $zip_args
+            echo $zip_args
         fi
     done
 }
