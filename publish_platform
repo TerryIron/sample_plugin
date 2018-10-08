@@ -30,7 +30,7 @@ def pack_platform(**kwargs):
     print 'Archive Platform {}'.format(_name)
     commands.getoutput('rm -rf ./target/{}/.git'.format(_name))
     print commands.getoutput('find ./target/{}'.format(_name))
-    commands.getoutput('cd ./target && zip -r ./{0}.zip {0} && cd -'.format(_name))
+    commands.getoutput('cd ./target && zip -r ./{0}.zip {0} && rm -rf {0} && cd -'.format(_name))
 
 
 def process_platform(**kwargs):
