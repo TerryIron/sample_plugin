@@ -36,7 +36,7 @@ def pack_platform(**kwargs):
 def process_platform(**kwargs):
     _name = kwargs['name']
     _url = kwargs['repo']
-    _branch = kwargs['branch']
+    _branch = kwargs.get('branch', 'master')
     commands.getoutput('git checkout {}'.format(_branch))
     print 'Pack Platform {}'.format(_name)
     commands.getoutput('git clone {} ./target/{}'.format(_url, _name))
