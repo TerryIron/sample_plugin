@@ -42,7 +42,10 @@ def process_platform(**kwargs):
     commands.getoutput('git clone {} ./target/{}'.format(_url, _name))
     if 'tag' in kwargs:
         commands.getoutput('cd ./target/{0} && git checkout {1} && cd -'.format(_name, kwargs['tag']))
-    return _name + '/' + kwargs['plugin_dir']
+    else:
+        commands.getoutput('cd ./target/{0} && git checkout {1} && cd -'.format(_name, _branch))
+    if 'plugin_dir' in kwargs:
+        return _name + '/' + kwargs['plugin_dir']
 
 
 def process_plugin(key, value, remote=None, plugin_path=None):
