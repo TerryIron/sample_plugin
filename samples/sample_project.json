@@ -1,0 +1,8 @@
+{
+    "platform": {
+        "branch": "branch_master",
+        "name": "project_test",
+        "repo": "project_test.git",
+        "plugin_dir": "project_test/plugins"
+    }
+}
