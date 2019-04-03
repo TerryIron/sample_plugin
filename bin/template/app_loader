@@ -421,6 +421,7 @@ def start(loader, **kwargs):
         APP.listen(int(c['$plugin_name.port']), str(c['$plugin_name.host']))
         tornado.ioloop.IOLoop.current().start()
 
+    global PID
     if not PID:
         p = Process(target=start_app)
         p.daemon = True
