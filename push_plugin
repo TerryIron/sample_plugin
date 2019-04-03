@@ -16,10 +16,13 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+function help_text() {
+    echo "usage: push_plugin [-h] REMOTE_NAME PLUGIN_NAME [PLUGIN_VER] ..."
+    exit
+}
 
 [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "-help" ] && {
-    echo "usage: push_plugin [-h] PLUGIN_NAME [PLUGIN_VER] ..."
-    exit
+    help_text
 }
 
 PWD=$(pwd)
@@ -42,14 +45,15 @@ function main() {
     push_plugin "$branch" "$target_remote"
 }
 
-name=$1
-ver=$2
+remote=$1
+name=$2
+ver=$3
 [ -z "$ver" ] && {
     ver="0.1.0"
 }
-remote=$3
-[ -z "$remote" ] && {
-    remote="origin"
+if [ "$remote" != "" ] && [ "$name" != "" ] && {
+    main "$branch" "$ver" "$remote"
+} || {
+    help_text
 }
-main "$branch" "$ver" "$remote"
 

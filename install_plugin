@@ -17,9 +17,13 @@
 #
 
 
-[ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "-help" ] && {
+function help_text() {
     echo "usage: install_plugin [-h] PLUGIN_NAME INSTALL_PATH ..."
     exit
+}
+
+[ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "-help" ] && {
+    help_text
 }
 
 pwd=$(pwd)
@@ -27,8 +31,16 @@ name=$1
 install_path=$2
 path="$pwd/templates"
 
-[ -f "$path/$name.zip" ] || {
-    echo "plugin $name not found"
-    exit 1
+function main() {
+    [ -f "$path/$name.zip" ] || {
+        echo "plugin $name not found"
+        exit 1
+    }
+    cp $path/$name.zip $install_path
 }
-cp $path/$name.zip $install_path
+
+[ "$name" != "" ] && [ "$install_path" != "" ] && {
+    main
+} || {
+    help_text
+}

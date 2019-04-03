@@ -17,30 +17,30 @@
 #
 
 
-[ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "-help" ] && {
-echo "usage: new_plugin [-h] [-n --no-version-name] PLUGIN_NAME PLUGIN_TYPE [PLUGIN_MODE=normal,server] [PLUGIN_VER] ..."
+function help_text() {
+    echo "usage: new_plugin [-h] [-n --no-version-name] PLUGIN_NAME PLUGIN_TYPE [PLUGIN_MODE=normal,server] [PLUGIN_VER] ..."
     exit
+}
+
+[ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "-help" ] && {
+    help_text
 }
 
 pwd=$(pwd)
 tag=$1
 if [[ "$tag" == "-n" || "$tag" == "--no-version-name" ]]; then
-tag="1"
-name=$2
-typ=$3
-mode=$4
-ver=$5
+    tag="1"
+    name=$2
+    typ=$3
+    mode=$4
+    ver=$5
 else
-tag="0"
-name=$1
-typ=$2
-mode=$3
-ver=$4
+    tag="0"
+    name=$1
+    typ=$2
+    mode=$3
+    ver=$4
 fi
-[ -z "$typ" ] && {
-    echo "Please config plugin type"
-    exit
-}
 [ -z "$mode" ] && {
     mode="normal"
 }
@@ -52,14 +52,22 @@ path="$pwd/templates"
 bin="$pwd/bin"
 
 
-cd $bin
-if [[ "$tag" == "1" ]]; then
-new_branch="plugin_$typ""_$name"
-else
-new_branch="plugin_$typ""_$name""_$ver"
-fi
-git checkout master
-git branch $new_branch
-git checkout $new_branch
-./new_plugin "$name" "$typ" "$ver" "$path" "$mode"
-cd $pwd
+function main() {
+    cd $bin
+    if [[ "$tag" == "1" ]]; then
+        new_branch="plugin_$typ""_$name"
+    else
+        new_branch="plugin_$typ""_$name""_$ver"
+    fi
+    git checkout master
+    git branch $new_branch
+    git checkout $new_branch
+    ./new_plugin "$name" "$typ" "$ver" "$path" "$mode"
+    cd $pwd
+}
+
+[ "$name" != "" ] && [ "$typ" != "" ] && {
+    main
+} || {
+    help_text
+}
