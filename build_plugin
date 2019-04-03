@@ -16,15 +16,19 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-
-[ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "-help" ] && {
-    echo "usage: build_plugin [-h] PLUGIN_NAME PLUGIN_VER ..."
+function help_text() {
+    echo "usage: build_plugin [-h] REMOTE_NAME PLUGIN_NAME PLUGIN_VER ..."
     exit
 }
 
+[ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "-help" ] && {
+    help_text
+}
+
 pwd=$(pwd)
-name=$1
-ver=$2
+remote=$1
+name=$2
+ver=$3
 path="$pwd/templates"
 
 bin="$pwd/bin"
@@ -32,14 +36,21 @@ bin="$pwd/bin"
 [ "$ver" != "" ] && {
     bname="plugin_"$name"_"$ver
 } || {
-    bname="plugin_"$name
+    bname="plugin_"$name"_0.1.0"
 }
 
+function main() {
+    cd $bin
+    if [ "$(git branch -a | grep $bname)" != "" ]; then
+        git checkout $bname
+        ./build_plugin "$name" "$path"
+    fi
+    cd $pwd
+    git checkout master 2>/dev/null
+}
 
-cd $bin
-if [ "$(git branch -a | grep $bname)" != "" ]; then
-    git checkout $bname
-fi
-./build_plugin "$name" "$path"
-cd $pwd
-git checkout master 2>/dev/null
+[ "$remote" != "" ] && [ "$name" != "" ] && {
+    main
+} || {
+    help_text
+}
