@@ -459,6 +459,7 @@ import json
 import urllib
 import logging
 import requests
+import commands
 import datetime
 from multiprocessing import Queue, Process
 from concurrent.futures import ThreadPoolExecutor
@@ -509,11 +510,27 @@ class Application(object):
 _APP = Application()
 
 
+def system_ports():
+    return tuple(set([i.split(':')[1].split(' ')[0]
+                      for i in commands.getoutput("netstat -tanp| grep LISTEN").split('\n')
+                      if len(i.split(':')) > 1 and i.split(':')[1].split(' ')[0]]))
+
+
+def system_new_port(start_num=50000):
+    _port_list = [int(i) for i in system_ports()]
+    import random
+    _port = random.randint(start_num, 65535)
+    while True:
+        if _port not in _port_list:
+            return _port
+        _port += 1
+
+
 @classprobe('run')
 class Schedule(tornado.web.RequestHandler):
     executor = ThreadPoolExecutor(100)
     HOST = '127.0.0.1'
-    PORT = 8889
+    PORT = system_new_port()
 
     @classmethod
     @call_later(3)
