@@ -196,6 +196,9 @@ cat >> $plugin_full_name/app.py << EOF
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+import os
+import json
+import time
 import logging
 import sqlite3
 from ConfigParser import ConfigParser
