@@ -243,6 +243,8 @@ def init():
 
 def config(**global_config):
     _config = dict()
+    _config.update(CONFIG)
+    _config.update(global_config)
     return _config
 
 
