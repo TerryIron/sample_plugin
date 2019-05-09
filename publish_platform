@@ -30,7 +30,7 @@ def pack_platform(**kwargs):
     if _name:
         print 'Archive Platform {}'.format(_name)
         commands.getoutput('rm -rf ./target/{}/.git'.format(_name))
-        commands.getoutput('find ./target/{}'.format(_name))
+        # commands.getoutput('find ./target/{}'.format(_name))
         commands.getoutput('cd ./target && zip -r ./{0}.zip {0} && rm -rf {0} && cd -'.format(_name))
 
 
@@ -61,9 +61,12 @@ def process_plugin(key, value, remote=None, plugin_path=None):
             if not os.path.exists('./target/{}'.format(plugin_path)):
                 raise Exception('Platform plugin_dir not found, {}'.format(plugin_path))
             print 'cp ./target/{}.zip ./target/{}'.format(key, plugin_path)
-            commands.getoutput('git checkout {} && git pull {} {} && ./pack_plugin && cp ./target/{}.zip ./target/{}'.format(_output, remote, _output, key, plugin_path))
+            if key and  plugin_path:
+                commands.getoutput('git checkout {} && git pull {} {} && ./pack_plugin && cp ./target/{}.zip ./target/{}'.format(_output, remote, _output, key, plugin_path))
+            print '1 {}'.format(commands.getoutput('ls -al ./target'))
         else:
             commands.getoutput('git checkout {} && git pull {} {} && ./pack_plugin'.format(_output, remote, _output))
+            print '2 {}'.format(commands.getoutput('ls -al ./target'))
 
 
 def main():
