@@ -63,10 +63,8 @@ def process_plugin(key, value, remote=None, plugin_path=None):
             print 'cp ./target/{}.zip ./target/{}'.format(key, plugin_path)
             if key and  plugin_path:
                 commands.getoutput('git checkout {} && git pull {} {} && ./pack_plugin && cp ./target/{}.zip ./target/{}'.format(_output, remote, _output, key, plugin_path))
-            print '1 {}'.format(commands.getoutput('ls -al ./target'))
         else:
             commands.getoutput('git checkout {} && git pull {} {} && ./pack_plugin'.format(_output, remote, _output))
-            print '2 {}'.format(commands.getoutput('ls -al ./target'))
 
 
 def main():
