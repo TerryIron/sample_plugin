@@ -30,13 +30,15 @@ function pack_plugins() {
             done
             local zip_args=""
             local path=$(echo $d|awk -F'/' '{print $2}')
-            zip_args=$zip_args" -9 -r $target_path/$path.zip" 
-            for i in $removepath; do
-                zip_args=$zip_args" --exclude=$path/$i*"
-            done
-            zip_args=$zip_args" $d"
-            zip $zip_args
-            echo $zip_args
+            [ "$path" != "" ] && {
+                zip_args=$zip_args" -9 -r $target_path/$path.zip" 
+                for i in $removepath; do
+                    zip_args=$zip_args" --exclude=$path/$i*"
+                done
+                zip_args=$zip_args" $d"
+                zip $zip_args
+                echo $zip_args
+            }
         fi
     done
 }
