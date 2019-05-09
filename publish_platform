@@ -27,10 +27,11 @@ import commands
 def pack_platform(**kwargs):
     commands.getoutput('git checkout master')
     _name = kwargs['name']
-    print 'Archive Platform {}'.format(_name)
-    commands.getoutput('rm -rf ./target/{}/.git'.format(_name))
-    print commands.getoutput('find ./target/{}'.format(_name))
-    commands.getoutput('cd ./target && zip -r ./{0}.zip {0} && rm -rf {0} && cd -'.format(_name))
+    if _name:
+        print 'Archive Platform {}'.format(_name)
+        commands.getoutput('rm -rf ./target/{}/.git'.format(_name))
+        commands.getoutput('find ./target/{}'.format(_name))
+        commands.getoutput('cd ./target && zip -r ./{0}.zip {0} && rm -rf {0} && cd -'.format(_name))
 
 
 def process_platform(**kwargs):
@@ -59,9 +60,10 @@ def process_plugin(key, value, remote=None, plugin_path=None):
         if plugin_path is not None:
             if not os.path.exists('./target/{}'.format(plugin_path)):
                 raise Exception('Platform plugin_dir not found, {}'.format(plugin_path))
-            print commands.getoutput('git checkout {} && ./pack_plugin && cp ./target/{}.zip ./target/{}'.format(_output, key, plugin_path))
+            print 'cp ./target/{}.zip ./target/{}'.format(key, plugin_path)
+            commands.getoutput('git checkout {} && git pull {} {} && ./pack_plugin && cp ./target/{}.zip ./target/{}'.format(_output, remote, _output, key, plugin_path))
         else:
-            print commands.getoutput('git checkout {} && ./pack_plugin'.format(_output))
+            commands.getoutput('git checkout {} && git pull {} {} && ./pack_plugin'.format(_output, remote, _output))
 
 
 def main():
@@ -75,7 +77,7 @@ def main():
         _plugin_path = process_platform(**_platform_dict)
 
     if 'remote' not in _dict:
-        _remote = None
+        _remote = 'origin'
     else:
         _remote = _dict.pop('remote')
         if not _remote:
