@@ -238,7 +238,8 @@ CONFIG = {}
 def init():
     global APP
     APP = Application()
-    CONFIG['logger.path'] = '/tmp/$plugin_name.log'
+    CONFIG['logger.path'] = '/tmp/${plugin_type}_${plugin_name}.log'
+    CONFIG['${plugin_type}_${plugin_name}.logger.path'] = CONFIG['logger.path']
 
 
 def config(**global_config):
@@ -557,37 +558,40 @@ PID = None
 
 
 def init():
-    CONFIG['logger.path'] = '/tmp/$plugin_name.log'
-    CONFIG['$plugin_name.port'] = 8889
-    CONFIG['$plugin_name.host'] = '127.0.0.1'
+    CONFIG['logger.path'] = '/tmp/${plugin_type}_${plugin_name}.log'
+    CONFIG['${plugin_type}_${plugin_name}.port'] = 8889
+    CONFIG['${plugin_type}_${plugin_name}.host'] = '127.0.0.1'
 
 
 def config(**global_config):
     c = dict()
     c['logger.path'] = global_config.get('logger.path', CONFIG['logger.path'])
-    c['$plugin_name.host'] = global_config.get(
-        '$plugin_name.host',
-        CONFIG['$plugin_name.host'])
-    c['$plugin_name.port'] = global_config.get(
-        '$plugin_name.port',
-        CONFIG['$plugin_name.port'])
+    c['${plugin_type}_${plugin_name}.logger.path'] = global_config.get('${plugin_type}_${plugin_name}.logger.path', CONFIG['logger.path'])
+    c['${plugin_type}_${plugin_name}.host'] = global_config.get(
+        '${plugin_type}_${plugin_name}.host',
+        CONFIG['${plugin_type}_${plugin_name}.host'])
+    c['${plugin_type}_${plugin_name}.port'] = global_config.get(
+        '${plugin_type}_${plugin_name}.port',
+        CONFIG['${plugin_type}_${plugin_name}.port'])
     return c
 
 
 def start(loader, **kwargs):
+    loader.logger.warn('start')
     from .server import make_route, make_app
     _result = dict()
     c = config(**loader.config)
     loader.logger.add_handler(c['logger.path'])
+    loader.logger.add_handler(c['${plugin_type}_${plugin_name}.logger.path'])
     _APP.set_logger(loader.logger)
 
     def start_app():
         global APP
-        Schedule.HOST = c['$plugin_name.host']
-        Schedule.PORT = c['$plugin_name.port']
+        Schedule.HOST = c['${plugin_type}_${plugin_name}.host']
+        Schedule.PORT = c['${plugin_type}_${plugin_name}.port']
         route = make_route(**APP_ROUTE)
         APP = make_app(route)
-        APP.listen(int(c['$plugin_name.port']), str(c['$plugin_name.host']))
+        APP.listen(int(c['${plugin_type}_${plugin_name}.port']), str(c['${plugin_type}_${plugin_name}.host']))
         tornado.ioloop.IOLoop.current().start()
 
     global PID
@@ -614,6 +618,7 @@ def start(loader, **kwargs):
             _result['result'] = d
             _result['data'] = d
             _result[loader.config_channel] = kwargs[loader.config_channel]
+            loader.logger.warn('end')
             yield _result
 
 EOF
