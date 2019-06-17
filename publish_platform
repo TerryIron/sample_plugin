@@ -34,6 +34,33 @@ def pack_platform(**kwargs):
         commands.getoutput('cd ./target && zip -r ./{0}.zip {0} && rm -rf {0} && cd -'.format(_name))
 
 
+def process_plugin(key, value, remote=None, plugin_path=None, path='.', target_path=None):
+    if remote:
+        _output = commands.getoutput('cd {} && git branch -a | grep remotes '
+                                     '| grep plugin_ | grep {}| grep {}'.format(path, key, value))
+    else:
+        _output = commands.getoutput('cd {} && git tag | grep plugin_ | grep {} | grep {}'.format(path, key, value))
+    if _output:
+        _output = _output.split('/')[-1]
+        print 'Pack Plugin {} Ver:{}'.format(key, value)
+        if plugin_path is not None:
+            if not os.path.exists('./target/{}'.format(plugin_path)):
+                raise Exception('Platform plugin_dir not found, {}'.format(plugin_path))
+            if key and plugin_path:
+                commands.getoutput('cd {} && git checkout {} && git pull {} {} && ./pack_plugin'.format(path, _output,
+                                                                                                        remote, _output))
+                if not target_path:
+                    target_path = './target/{}'.format(plugin_path)
+                print 'cp {}/target/{}.zip {}'.format(path, key, target_path)
+                commands.getoutput('cd {path}/target && unzip {name}.zip '
+                                   '&& zip -r {name}.zip {name} && rm -rf {name}'.format(path=path, name=key))
+                commands.getoutput('mkdir -p {}'.format(target_path))
+                print commands.getoutput('cp {}/target/{}.zip {}'.format(path, key, target_path))
+        else:
+            commands.getoutput('cd {} && git checkout {} && git pull {} {} && ./pack_plugin'.format(path, _output,
+                                                                                                    remote, _output))
+
+
 def process_platform(**kwargs):
     _name = kwargs['name']
     _url = kwargs['repo']
@@ -46,25 +73,34 @@ def process_platform(**kwargs):
     else:
         commands.getoutput('cd ./target/{0} && git checkout {1} && cd -'.format(_name, _branch))
     if 'plugin_dir' in kwargs:
+        if 'plugin_repo' in kwargs and 'plugins' in kwargs:
+            process_platform_plugin(**kwargs)
         return _name + '/' + kwargs['plugin_dir']
 
 
-def process_plugin(key, value, remote=None, plugin_path=None):
-    if remote:
-        _output = commands.getoutput('git branch -a | grep remotes | grep plugin_ | grep {}| grep {}'.format(key, value))
-    else:
-        _output = commands.getoutput('git tag | grep plugin_ | grep {} | grep {}'.format(key, value))
-    if _output:
-        _output = _output.split('/')[-1]
-        print 'Pack Plugin {} Ver:{}'.format(key, value)
-        if plugin_path is not None:
-            if not os.path.exists('./target/{}'.format(plugin_path)):
-                raise Exception('Platform plugin_dir not found, {}'.format(plugin_path))
-            print 'cp ./target/{}.zip ./target/{}'.format(key, plugin_path)
-            if key and  plugin_path:
-                commands.getoutput('git checkout {} && git pull {} {} && ./pack_plugin && cp ./target/{}.zip ./target/{}'.format(_output, remote, _output, key, plugin_path))
+def process_platform_plugin(**kwargs):
+    _name = kwargs['name']
+    _url = kwargs['plugin_repo']
+    _plugin_path = kwargs['plugin_dir']
+    print 'Pack Platform Plugin {}'.format(_name)
+    _platform_plugin_git = './target/{}_{}'.format(_name, 'plugin')
+    commands.getoutput('git clone {} {}'.format(_url, _platform_plugin_git))
+    _platform_plugin_path = _name + '/' + kwargs['plugin_dir']
+    _plugin_name = None
+    _plugin_dir = None
+    if 'plugin_name' in kwargs['plugins'] and 'plugin_dir' in kwargs['plugins']:
+        _plugin_name = kwargs['plugins'].pop('plugin_name')
+        _plugin_dir = kwargs['plugins'].pop('plugin_dir')
+        commands.getoutput('unzip ./target/{}.zip -d ./target'.format(_plugin_name))
+    for k, v in kwargs['plugins'].items():
+        if _plugin_name and _plugin_dir:
+            process_plugin(k, v, 'origin',
+                           _platform_plugin_path, _platform_plugin_git,
+                           './target/' + _plugin_name + '/' + _plugin_dir)
         else:
-            commands.getoutput('git checkout {} && git pull {} {} && ./pack_plugin'.format(_output, remote, _output))
+            process_plugin(k, v, 'origin',
+                           _platform_plugin_path, _platform_plugin_git)
+    commands.getoutput('rm -rf {}'.format(_platform_plugin_git))
 
 
 def main():
