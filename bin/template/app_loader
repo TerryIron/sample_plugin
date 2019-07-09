@@ -49,6 +49,10 @@ cat >> $plugin_full_name/__init__.py << EOF
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 EOF
+cat >> $plugin_full_name/install.txt << EOF
+EOF
+cat >> $plugin_full_name/patch.txt << EOF
+EOF
 cat >> $plugin_full_name/requirements.txt << EOF
 sqlalchemy==1.1.9
 zope.sqlalchemy
@@ -656,7 +660,9 @@ cat >> $plugin_full_name/app.json << EOF
     "type": "$plugin_type",
     "name": "$plugin_type$split$plugin_name",
     "language": "python2",
+    "install": "install.txt",
     "imports": "requirements.txt",
+    "patch": "patch.txt",
     "actions": {
         "init": "app.init",
         "start": "app.start",
