@@ -1,0 +1,75 @@
+#!/bin/bash
+
+PWD=$(pwd)
+GIT_REMOTE=$1
+GIT_PLUGIN_NAME="plugin"
+PLUGIN_PATH=$PWD/templates
+DOC_PATH=$PWD/doc/quick/plugin_api.md
+DOC_TITLE="插件中心接口文档"
+
+[ "$GIT_REMOTE" == "" ] &&  {
+    GIT_REMOTE="origin"
+}
+
+print_title() {
+    echo > $DOC_PATH
+    cat >> $DOC_PATH << EOF
+# $DOC_TITLE
+
+EOF
+}
+
+print_api() {
+    for b in $(git branch -a | grep $GIT_REMOTE | grep $GIT_PLUGIN_NAME); do
+        echo "branch $b"
+        branch_name=$(echo $b | sed -n 's/.*\/\(.*\)/\1/p')
+        git checkout $branch_name && git pull $GIT_REMOTE $branch_name
+        app_name=$(echo $b | sed -n 's/.*\/plugin_\(.*\)_.*/\1/p')
+        version=$(cat templates/$app_name/app.json  | grep version  | sed -n 's/.*"\(.*\)".*/\1/p')
+
+cat >> $DOC_PATH << EOF
+
+## $app_name
+
+基础信息 | 说明 
+:----:|:----:
+所属分支 | $branch_name
+版本 | $version
+
+外部操作 | 函数入口
+:----:|:----:
+EOF
+ 
+       for a in $(cat templates/$app_name/app.json  | sed -n '/action/, /public_action/p' | grep app | awk -F' ' '{print $1$2}'); do
+           pub_api=$(echo $a | sed -n 's/"\([^"]*\)".*/\1/p')
+           app_api=$(echo $a | sed -n 's/.*:"\([^"]*\)".*/\1/p' | awk -F'.' '{print $2}')
+
+cat >> $DOC_PATH << EOF
+$pub_api | $app_api
+EOF
+
+       done
+
+cat >> $DOC_PATH << EOF
+
+### 包含参数
+EOF
+       for i in $(cat templates/$app_name/app.py  | sed -n '/\[.*\]/p' | grep $app_name| sed -n "s/[^[]*\[\([^]]*\)\].*/\1/p" | grep "^'" | sort | uniq); do
+           echo $i
+           arg_name=${i:1:-1}
+
+cat >> $DOC_PATH << EOF
+* $arg_name
+EOF
+        done
+    done
+}
+
+main() {
+    git checkout master
+    print_title
+    print_api
+    git checkout master
+}
+
+main
