@@ -4,7 +4,7 @@ PWD=$(pwd)
 GIT_REMOTE=$1
 GIT_PLUGIN_NAME="plugin"
 PLUGIN_PATH=$PWD/templates
-DOC_PATH=$PWD/doc/quick/plugin_api.md
+DOC_PATH=/tmp/plugin_api.md
 DOC_TITLE="插件中心接口文档"
 
 [ "$GIT_REMOTE" == "" ] &&  {
@@ -53,8 +53,9 @@ EOF
 cat >> $DOC_PATH << EOF
 
 ### 包含参数
+* logger.path
 EOF
-       for i in $(cat templates/$app_name/app.py  | sed -n '/\[.*\]/p' | grep $app_name| sed -n "s/[^[]*\[\([^]]*\)\].*/\1/p" | grep "^'" | sort | uniq); do
+       for i in $(cat templates/$app_name/app.py  | sed -n '/\[.*\]/p' | grep $app_name| sed -n "s/[^[]*\[\([^]]*\)\].*/\1/p" | grep "^'" | sort | uniq | grep $app_name); do
            echo $i
            arg_name=${i:1:-1}
 
