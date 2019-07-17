@@ -24,7 +24,7 @@ print_api() {
         echo "branch $b"
         branch_name=$(echo $b | sed -n 's/.*\/\(.*\)/\1/p')
         git checkout $branch_name && git pull $GIT_REMOTE $branch_name
-        app_name=$(echo $b | sed -n 's/.*\/plugin_\(.*\)_.*/\1/p')
+        app_name=$(echo $b | sed -n 's/.*plugin_\([^_]*_[^_]*\)_.*/\1/p')
         version=$(cat templates/$app_name/app.json  | grep version  | sed -n 's/.*"\(.*\)".*/\1/p')
 
 cat >> $DOC_PATH << EOF
