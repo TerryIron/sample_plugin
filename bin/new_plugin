@@ -28,8 +28,9 @@ function new_plugin() {
     local split="_"
 
     cd $plugin_path
-    mkdir -p $plugin_type$split$plugin_name
-    local _plugin=$plugin_type$split$plugin_name
+    local _plugin_name=$(echo $plugin_name | awk -F"$split" '{print $1}')
+    local _plugin=$plugin_type$split$_plugin_name
+    mkdir -p $_plugin
 
     # new_plugin code
 
