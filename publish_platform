@@ -47,8 +47,10 @@ def process_plugin(key, value, remote=None, plugin_path=None, path='.', target_p
             if not os.path.exists('./target/{}'.format(plugin_path)):
                 raise Exception('Platform plugin_dir not found, {}'.format(plugin_path))
             if key and plugin_path:
-                commands.getoutput('cd {} && git checkout {} && git pull {} {} && ./pack_plugin'.format(path, _output,
-                                                                                                        remote, _output))
+                print commands.getoutput('cd {} && git checkout {} '
+                                         '&& git pull {} {} '
+                                         '&& ./pack_plugin'.format(path, _output,
+                                                                   remote, _output))
                 if not target_path:
                     target_path = './target/{}'.format(plugin_path)
                 print 'cp {}/target/{}.zip {}'.format(path, key, target_path)
@@ -67,7 +69,7 @@ def process_platform(**kwargs):
     _branch = kwargs.get('branch', 'master')
     commands.getoutput('git checkout {}'.format(_branch))
     print 'Pack Platform {}'.format(_name)
-    commands.getoutput('git clone {} ./target/{}'.format(_url, _name))
+    print commands.getoutput('git clone {} ./target/{}'.format(_url, _name))
     if 'tag' in kwargs:
         commands.getoutput('cd ./target/{0} && git checkout {1} && cd -'.format(_name, kwargs['tag']))
     else:
@@ -86,15 +88,17 @@ def platform_init_ready(**kwargs):
     import os.path
     _target_name = os.path.basename(urlparse.urlparse(_target_url).path).split('.')[0]
     _target_items = _target_init['pull']
-    commands.getoutput('git clone {} ./target/{}'.format(_target_url, _target_name))
+    print commands.getoutput('git clone {} ./target/{}'.format(_target_url, _target_name))
     _target_name = './target/{}'.format(_target_name)
     for k, v in _target_items.items():
-        _k_path = os.path.join(_target_path, k)
+        _k_path = os.path.join(_target_name, k)
         _v_dir = '/'.join(v.split('/')[:-1])
         if os.path.exists(_k_path):
             if _v_dir:
                 commands.getoutput('mkdir -p {}/{}'.format(_target_path, _v_dir))
-            commands.getoutput('cp -rf {}/{} {}/{}'.format(_target_name, _k_path, _target_path, v))
+            print 'cp -rf {} {}/{}'.format(_k_path, _target_path, v)
+            commands.getoutput('cp -rf {} {}/{}'.format(_k_path, _target_path, v))
+    commands.getoutput('rm -rf {}'.format(_target_name))
 
 
 def process_platform_plugin(**kwargs):
@@ -103,7 +107,7 @@ def process_platform_plugin(**kwargs):
     _plugin_path = kwargs['plugin_dir']
     print 'Pack Platform Plugin {}'.format(_name)
     _platform_plugin_git = './target/{}_{}'.format(_name, 'plugin')
-    commands.getoutput('git clone {} {}'.format(_url, _platform_plugin_git))
+    print commands.getoutput('git clone {} {}'.format(_url, _platform_plugin_git))
     _platform_plugin_path = _name + '/' + kwargs['plugin_dir']
     _plugin_name = None
     _plugin_dir = None
@@ -131,8 +135,9 @@ def main():
     if 'platform' in _dict:
         _platform_dict = _dict.pop('platform')
         _plugin_path = process_platform(**_platform_dict)
-        if 'init' in _platform_dict:
-            platform_init_ready(**_platform_dict)
+
+    if not _platform_dict:
+        _platform_dict = {}
 
     if 'remote' not in _dict:
         _remote = 'origin'
@@ -143,6 +148,9 @@ def main():
 
     for k, v in _dict.items():
         process_plugin(k, v, remote=_remote, plugin_path=_plugin_path)
+
+    if 'init' in _platform_dict:
+        platform_init_ready(**_platform_dict)
 
     if _platform_dict:
         pack_platform(**_platform_dict)
