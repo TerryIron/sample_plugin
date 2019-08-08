@@ -78,6 +78,25 @@ def process_platform(**kwargs):
         return _name + '/' + kwargs['plugin_dir']
 
 
+def platform_init_ready(**kwargs):
+    _target_path = './target/{}'.format(kwargs['name'])
+    _target_init = kwargs['init']
+    _target_url = _target_init['repo']
+    import urlparse
+    import os.path
+    _target_name = os.path.basename(urlparse.urlparse(_target_url).path).split('.')[0]
+    _target_items = _target_init['pull']
+    commands.getoutput('git clone {} ./target/{}'.format(_target_url, _target_name))
+    _target_name = './target/{}'.format(_target_name)
+    for k, v in _target_items.items():
+        _k_path = os.path.join(_target_path, k)
+        _v_dir = '/'.join(v.split('/')[:-1])
+        if os.path.exists(_k_path):
+            if _v_dir:
+                commands.getoutput('mkdir -p {}/{}'.format(_target_path, _v_dir))
+            commands.getoutput('cp -rf {}/{} {}/{}'.format(_target_name, _k_path, _target_path, v))
+
+
 def process_platform_plugin(**kwargs):
     _name = kwargs['name']
     _url = kwargs['plugin_repo']
@@ -112,6 +131,8 @@ def main():
     if 'platform' in _dict:
         _platform_dict = _dict.pop('platform')
         _plugin_path = process_platform(**_platform_dict)
+        if 'init' in _platform_dict:
+            platform_init_ready(**_platform_dict)
 
     if 'remote' not in _dict:
         _remote = 'origin'
